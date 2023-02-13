@@ -1,4 +1,3 @@
-//controler for level and current level
 
 const db = require('../models/index')
 const Student_level = db.student_level

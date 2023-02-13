@@ -31,13 +31,14 @@ const getWords = async (req, res) => {
     //     }
     // }, { group: 'word_id' })
 
-    // const [word_codes, metadata] = await sequelize.query(`select word_id from vowelization_for_word v1
-    // where vowelization_id in ${requiredVoweles} or vowelization_id in ${optionalVoweles} and
-    // ${requiredVoweles.unique.length} =  (select count(distinct vowelization_id)
-    // from vowelization_for_word v2
-    // where v2.word_id = v1.word_id)
-    // group by word_id`)
-
+    const [word_codes, metadata] = 
+    await sequelize.query(`select word_id from vowelization_for_word v1
+                            where vowelization_id in ${requiredVoweles} or vowelization_id in ${optionalVoweles} and
+                            ${requiredVoweles.unique.length} =  (select count(distinct vowelization_id)
+                                                                from vowelization_for_word v2
+                                                                where v2.word_id = v1.word_id
+                                                                and vowelization_id in ${requiredVoweles})
+                            group by word_id`)
 
     let words = await Word.findAll({ attributes: ['word'] }, { where: { word_id: word_codes } })
     res.send(words)
@@ -69,12 +70,14 @@ const newStage = async (req, res) => {
 }
 
 const updateSuccess = async (req, res) => {
+    let curStage = await Lesson_for_student.findOne({ attributes: ['stage'] }, { where: { lesson_id: req.lessonId } })
     await Sublesson_for_student.update(
         {
-            // values
+            success: req.success
         },
         {
-            // options
+            lesson_id: req.lessonId,
+            stage: curStage
         }
     )
 }

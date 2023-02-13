@@ -1,21 +1,25 @@
-module.exports = (sequelize, DataTypes) => {
+const { sequelize, DataTypes } = require("./sequelize");
     const Vowelization_for_lesson = sequelize.define(
-        "vowelization_for_lesson",
+        "vowelizations_for_lessons",
         {
             vowelization_for_lesson_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
+                primaryKey:true,
+                autoIncrement:true
             },
             vowelization_id: {
                 type: DataTypes.INTEGER,
+                allowNull:false
             },
             lesson_id: {
                 type: DataTypes.INTEGER,
+                allowNull:false
             },
         },
         {
             timestamps: false,
         }
     );
-    return Vowelization_for_lesson;
-};
+
+    module.exports = Vowelization_for_lesson

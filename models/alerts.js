@@ -1,17 +1,20 @@
 const { sequelize, DataTypes } = require("./sequelize");
 
-const Vowelization = sequelize.define(
-    "vowelizations",
+const Alerts = sequelize.define(
+    "alerts",
     {
-        vowelization_id: {
+        alert_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             primaryKey: true,
             autoIncrement: true
         },
-        vowelization: {
+        alert_description: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: false
+        },
+        alert: {
+            type: DataTypes.TEXT,
         },
     },
     {
@@ -19,5 +22,4 @@ const Vowelization = sequelize.define(
     }
 );
 
-
-module.exports = Vowelization
+module.exports = Alerts;

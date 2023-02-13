@@ -1,21 +1,27 @@
-module.exports = (sequelize, DataTypes) => {
-    const Student_level = sequelize.define(
-        "student_level",
-        {
-            student_level_id: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-            },
-            vowelization_id: {
-                type: DataTypes.INTEGER,
-            },
-            user_id: {
-                type: DataTypes.INTEGER,
-            },
+const { sequelize, DataTypes } = require("./sequelize");
+
+const Student_level = sequelize.define(
+    "student_level",
+    {
+        student_level_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey:true,
+            autoIncrement:true
         },
-        {
-            timestamps: false,
-        }
-    );
-    return Student_level;
-};
+        vowelization_id: {
+            type: DataTypes.INTEGER,
+            allowNull:false
+        },
+        user_id: {
+            type: DataTypes.INTEGER,
+            allowNull:false
+        },
+    },
+    {
+        timestamps: false,
+        freezeTableName: true
+    }
+);
+
+module.exports = Student_level;
