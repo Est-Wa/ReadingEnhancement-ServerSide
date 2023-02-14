@@ -20,10 +20,6 @@ const User = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false
         },
-        password: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
         email_address: {
             type: DataTypes.STRING,
             allowNull: false
@@ -45,6 +41,19 @@ const User = sequelize.define(
         id_currentLesson: {
             type: DataTypes.INTEGER,
         },
+        password: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        roles: {
+            allowNull: false,
+            type: DataTypes.ENUM('USER', 'ADMIN'),
+            defaultValue: 'USER'
+        },
+        active: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true
+        }
     },
     {
         timestamps: false,
