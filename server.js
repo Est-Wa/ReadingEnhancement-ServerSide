@@ -16,5 +16,5 @@ app.use(express.json())
 app.use(cookieParser())
 
 //routes
-app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/auth", require("./routes/authRouter"));
 app.listen(PORT, () => console.log(`Server in running on port ${PORT}`))
