@@ -38,7 +38,8 @@ const login = async (req, res) => {
     }
 
     //Create the token
-    const accessToken = jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET)
+    //const accessToken = jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET)
+    const accessToken = jwt.sign(userInfo,'60a407c80785905efab187be0b6ab63fcd5a77b6e9dfbb62b329805dc17f165d82725997a471ee025b7d3f46ebc9894a405d3ae13594c44fb53635ac12bf1417')
     //res.setHeader('Authorization', `Bearer ${accessToken}`)
 
     res.json({ accessToken: accessToken })
@@ -46,6 +47,7 @@ const login = async (req, res) => {
 }
 
 const register = async (req, res) => {
+    console.log(req.body.password);
     const { password,
         user_name,
         user_lastName,
@@ -55,6 +57,8 @@ const register = async (req, res) => {
         student_lastName,
         birth_date,
         gender } = req.body
+
+        console.log(req.body)
 
     if (!user_lastName || !user_firstName || !email_address || !student_firstName || !student_lastName || !user_name || !password) {// Confirm data
         return res.status(400).json({ message: 'All fields are required' })

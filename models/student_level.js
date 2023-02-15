@@ -13,7 +13,7 @@ const Student_level = sequelize.define(
             type: DataTypes.INTEGER,
             allowNull:false
         },
-        user_id: {
+        student_id: {
             type: DataTypes.INTEGER,
             allowNull:false
         },

@@ -6,6 +6,8 @@ const Word = sequelize.define(
         word_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            primaryKey:true,
+            autoIncrement:true
         },
         word: {
             type: DataTypes.STRING,
