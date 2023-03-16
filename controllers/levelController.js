@@ -9,11 +9,11 @@ const getLevelForStudent = async (req, res) => {
     if (!userId) {
         return res.status(400).json({ message: 'A user id is required' })
     }
-    level = await Student_level.findAll({
+    let level = await Student_level.findAll({
         attributes: ['vowelization_id'],
         where: { student_id: userId }
     })
-    vowels = await Vowelization.find({
+    let vowels = await Vowelization.findAll({
         attributes: ['vowelization'],
         where: { vowelization_id: { [Op.in]: level } }
     })
@@ -27,10 +27,14 @@ const getLevelForStudent = async (req, res) => {
 
 //delete
 const deleteLevel = async (req, res) => {
+    let { studentId, vowelizationId } = req.params;
+    if (!studentId || !vowelizationId) {
+        return res.status(400).json({ message: `all fields are required` })
+    }
     let des = await Student_level.destroy({
         where: {
-            student_id: req.userId,
-            vowelization_id: req.vowelizationId
+            student_id: studentId,
+            vowelization_id: vowelizationId
         }
     });
     if (des) {
@@ -43,24 +47,28 @@ const deleteLevel = async (req, res) => {
 
 //create
 const addLevel = async (req, res) => {
-    let{studentId,vowelization} = req.body;
-    if(!studentId||!vowelization){
-        return res.status(400).json({message:`all fields are required`})
+    let { studentId, vowelization } = req.body;
+    if (!studentId || !vowelization) {
+        return res.status(400).json({ message: `all fields are required` })
     }
     let vowel = await Vowelization.findOne({
         attributes: ['vowelization_id'],
         where: { vowelization: vowelization }
     });
     const created_student_level = await Student_level.create({
-        student_id: userId,
+        student_id: studentId,
         vowelization_id: vowel.vowelization_id,
     });
-    if(created_student_level){
-        res.status(200).json({message:`created successfuly`})
+    if (created_student_level) {
+        res.status(200).json({ message: `created successfuly` })
     }
-    else{
-        res.status(400).json({message:`invalied data`})
+    else {
+        res.status(400).json({ message: `invalied data` })
     }
 };
 
-module.exports={getLevelForStudent,deleteLevel,addLevel}
+module.exports = {
+    getLevelForStudent,
+    deleteLevel,
+    addLevel
+}

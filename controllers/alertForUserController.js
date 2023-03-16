@@ -8,11 +8,11 @@ const SubLesson_for_student = db.sublessons_for_students
 
 //create
 const addAlertForStudent = async (req, res) => {
-    const { user_id, alert_id, alert_date } = req.body
-    if (!user_id || !alert_id || !alert_date) {
+    const { user_id, alert_id } = req.body
+    if (!user_id || !alert_id ) {
         return res.status(400).json({ message: 'All fields are required' })
     }
-    const AlertForUser = { user_id, alert_id, alert_date }
+    const AlertForUser = { user_id, alert_id, alert_date:new Date() }
     const createdAlertForUser = await Alerts_for_users.create(AlertForUser)
     if (createdAlertForUser) { // Created 
         return res.status(201).json({ message: `New alert for user ${createdAlertForUser.alert_for_user_id} created` })
@@ -65,7 +65,7 @@ const getAlertsForUsersByDate = async (req, res) => {
 //האם נצרך?
 const getAlertsForUsersId = async (req, res) => {
 }
-//uptade
+//update
 //do I need a option for updating or deleting, because once an alert is created successfully why should I need to uptade it or delete it?
 //delete
 
@@ -85,26 +85,26 @@ const checkAllAlerts = async (req, res) => {
     let curSubLesson = await SubLesson_for_student.findOne({ where: { lesson_id: lesson.lesson_id, stage: stage } })
     let prevSubLesson = await SubLesson_for_student.findOne({ where: { lesson_id: lesson.lesson_id, stage: stage - 1 } })
     if (lesson.is_complit && lesson.success >= 8) {
-        let alert = await fetch(`http://localhost:3600/api/alert/:${'הגיע הזמן לעבור לשיעור הבא!'}`)
-        //add alert to db
+        const alert = await fetch(`http://localhost:3600/api/alert/:${'הגיע הזמן לעבור לשיעור הבא!'}`)
+        await fetch(`http://localhost:3600/api/alertForUser`,{method:post,body:{user_id:user.user_id,alert_id:alert.alert_id}})
         sendAlert(alert, user);
         countAlert++;
     }
     if (lesson.is_complit && lesson.success < 8) {
-        let alert = await fetch(`http://localhost:3600/api/alert/:${'נראה כי כדאי לעבור שוב על השיעור שהסתיים עכשיו'}`)
-        //add alert to db
+        const alert = await fetch(`http://localhost:3600/api/alert/:${'נראה כי כדאי לעבור שוב על השיעור שהסתיים עכשיו'}`)
+        await fetch(`http://localhost:3600/api/alertForUser`,{method:post,body:{user_id:user.user_id,alert_id:alert.alert_id}})
         sendAlert(alert, user);
         countAlert++;
     }
     if (prevSubLesson && prevSubLesson.success < 7 && lesson.success > 8) {
-        let alert = await fetch(`http://localhost:3600/api/alert/:${'יש לשקול האם הקצב מהיר מדי'}`)
-        //add alert to db
+        const alert = await fetch(`http://localhost:3600/api/alert/:${'יש לשקול האם הקצב מהיר מדי'}`)
+        await fetch(`http://localhost:3600/api/alertForUser`,{method:post,body:{user_id:user.user_id,alert_id:alert.alert_id}})
         sendAlert(alert, user);
         countAlert++;
     }
     if (curSubLesson.sublesson_date != new Date) {
-        let alert = await fetch(`http://localhost:3600/api/alert/:${"עוד לא תרגלנו היום"}`)
-        //add alert to db
+        const alert = await fetch(`http://localhost:3600/api/alert/:${"עוד לא תרגלנו היום"}`)
+        await fetch(`http://localhost:3600/api/alertForUser`,{method:post,body:{user_id:user.user_id,alert_id:alert.alert_id}})
         sendAlert(alert, user);
         countAlert++;
     }

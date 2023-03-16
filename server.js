@@ -5,7 +5,7 @@ const app = express()
 const path = require('path')
 const cors = require('cors')
 const PORT = process.env.PORT || 3600
-const {sendAlert} = require('./controllers/alertForUserController')
+const { sendAlert } = require('./controllers/alertForUserController')
 
 
 
@@ -21,4 +21,11 @@ console.log(process.env.NODE_ENV)
 //routes
 app.use("/api/auth", require("./routes/authRouter"));
 app.use("/api/alert", require("./routes/alertRouter"));
+app.use("/api/alertForUser", require("./routes/alertForUserRouter"));
+app.use("/api/lesson", require("./routes/lessonRouter"));
+app.use("/api/level", require("./routes/levelRouter"));
+app.use("/api/vowelForLesson", require("./routes/vowelForLessonRouter"));
+app.use("/api/vowel", require("./routes/vowelRouter"));
+app.use("/api/word", require("./routes/wordRouter"));
+
 app.listen(PORT, () => console.log(`Server in running on port ${PORT}`))

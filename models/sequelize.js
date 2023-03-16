@@ -4,7 +4,8 @@ const {Sequelize, DataTypes} = require('sequelize');
 
 const sequelize = new Sequelize(
   'reading_lesson',
- {
+  'root',
+  '1234esther', {
       host:'localhost',
       dialect: dbConfig.dialect,
       operatorsAliases: false,

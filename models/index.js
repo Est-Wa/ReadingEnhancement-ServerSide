@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize');
-const {sequelize} = require('./sequelize');
+const { sequelize } = require('./sequelize');
 const { applyExtraSetup } = require('./extra-setup');
 
 const db = {}
@@ -21,7 +21,7 @@ db.alerts_for_users = require('./alerts_for_users')
 
 applyExtraSetup();
 
-db.sequelize.sync({ alter: true })
+db.sequelize.sync({ force: false, alter: true })
     .then(() => {
         console.log('yes re-sync done!')
     })
