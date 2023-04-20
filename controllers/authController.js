@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const User = db.users
 
+//✌
 const login = async (req, res) => {
 
     const { user_name, password } = req.body
@@ -34,7 +35,6 @@ const login = async (req, res) => {
         birth_date: foundUser.birth_date,
         gender: foundUser.gender,
         id_currentLesson: foundUser.id_currentLesson,
-        roles: foundUser.roles
     }
 
     //Create the token
@@ -42,10 +42,12 @@ const login = async (req, res) => {
     const accessToken = jwt.sign(userInfo,'60a407c80785905efab187be0b6ab63fcd5a77b6e9dfbb62b329805dc17f165d82725997a471ee025b7d3f46ebc9894a405d3ae13594c44fb53635ac12bf1417')
     //res.setHeader('Authorization', `Bearer ${accessToken}`)
 
-    res.json({ accessToken: accessToken })
+    res.json({ accessToken: accessToken,
+    user : userInfo })
 
 }
 
+//✌
 const register = async (req, res) => {
     console.log(req.body.password);
     const { password,

@@ -3,6 +3,7 @@ const Vowelization_for_lesson = db.vowelizations_for_lessons
 const Vowelization = db.vowelization
 const { Op } = require("sequelize");
 
+//✌
 //create
 const addVowelForLesson = async (req, res) => {
     let{lessonId,vowelization} = req.body;
@@ -25,17 +26,19 @@ const addVowelForLesson = async (req, res) => {
     }
 };
 
+//✌
 //read
 const getVowelsForLesson = async (req, res) => {
-    const lessonId = req.lessonId
+    const lessonId = req.params.lessonId
     if (!lessonId) {
         return res.status(400).json({ message: 'A lesson id is required' })
     }
-    level = await Vowelization_for_lesson.findAll({
+    let level = await Vowelization_for_lesson.findAll({
         attributes: ['vowelization_id'],
         where: { lesson_id: lessonId }
     })
-    vowels = await Vowelization.findAll({
+    level = [...level].map(obj => obj.vowelization_id);
+    const vowels = await Vowelization.findAll({
         attributes: ['vowelization'],
         where: { vowelization_id: { [Op.in]: level } }
     })

@@ -7,8 +7,6 @@ const cors = require('cors')
 const PORT = process.env.PORT || 3600
 const { sendAlert } = require('./controllers/alertForUserController')
 
-
-
 //middleware
 //for static files that is send as a response
 //app.use('/', express.static(path.join(__dirname,'public')))

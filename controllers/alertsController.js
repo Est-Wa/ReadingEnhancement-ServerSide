@@ -1,3 +1,4 @@
+
 const db = require('../models/index')
 
 const Alerts = db.alerts

@@ -36,7 +36,7 @@ const User = sequelize.define(
             type: DataTypes.DATE,
         },
         gender: {
-            type: DataTypes.STRING,
+            type: DataTypes.ENUM('male', 'female'),
         },
         id_currentLesson: {
             type: DataTypes.INTEGER,

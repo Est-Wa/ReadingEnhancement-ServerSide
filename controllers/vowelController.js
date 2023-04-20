@@ -15,6 +15,7 @@ const db = require ('../models/index');
 
 const Vowelization = db.vowelization
 
+//✌
 //create
 const addVowel = async (req, res) => {
     let { vowelization } = req.body;
@@ -32,9 +33,11 @@ const addVowel = async (req, res) => {
     }
 };
 
+//✌
 //read
 const getVowelizationById = async (req, res) => {
-    const vowelId = req.vowelId
+    const vowelId = req.params.vowelId
+    console.log(vowelId)
     if (!vowelId) {
         return res.status(400).json({ message: 'A vowelization id is required' })
     }
@@ -50,9 +53,9 @@ const getVowelizationById = async (req, res) => {
     }
 }
 
+//✌
 const getAllVowelizations = async (req, res) => {
     let vowels = await Vowelization.findAll({
-        where: { vowelization_id: { [Op.in]: level } }
     })
     if (vowels) {
         res.status(200).json(vowels)

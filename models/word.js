@@ -12,6 +12,9 @@ const Word = sequelize.define(
         word: {
             type: DataTypes.STRING,
         },
+        path:{
+            type: DataTypes.STRING
+        }
     },
     {
         timestamps: false,
