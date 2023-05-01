@@ -34,6 +34,7 @@ const getWords = async (req, res) => {
     if (withImg == 'true') {
         console.log('with image')
         const wordsWithImgs = words.filter(word => word.path != null)
+        words = words.filter(word=>word.path == null)
         words = words.map(word => word.word)
         const dataToReturn = { words: words, wordsWithImgs }
         res.send(dataToReturn)
@@ -42,8 +43,6 @@ const getWords = async (req, res) => {
     words = words.map(word => word.word)
     res.send(words)
 }
-
-
 
 const getCurrentStage = async (req, res) => {
     let userId = req.params.userId
@@ -79,9 +78,13 @@ const newStage = async (req, res) => {
 }
 
 const updateSuccess = async (req, res) => {
-    const { lessonId, success } = req.body
-    const curStage = await Lesson_for_student.findOne({ attributes: ['stage'] }, { where: { lesson_id: lessonId } })
-    await Sublesson_for_student.update(
+    const { userId, success } = req.body
+    console.log(`userrrrrrrrrrrrr ${userId}`)
+    let lessonId = await User.findOne({ attributes: ['id_currentLesson'] }, { where: { user_id: userId } })//id of current lesson
+    console.log(`lesson  id ${lessonId.id_currentLesson}`)
+    const curStage = await Lesson_for_student.findOne({ attributes: ['current_stage'] }, { where: { lesson_id: lessonId } })
+    console.log(`stage ${curStage}`)
+    let update = await Sublesson_for_student.update(
         {
             success: success
         },
@@ -92,6 +95,12 @@ const updateSuccess = async (req, res) => {
             }
         }
     )
+    if(update){
+        res.send('updated')
+    }
+    else{
+        res.send('err')
+    }
 }
 
 const getSuccessForDate = async (req, res) => {
