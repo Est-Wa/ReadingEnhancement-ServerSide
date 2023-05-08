@@ -70,10 +70,22 @@ const newLesson = async (req, res) => {
     }
 
 }
+const newLessonForUser=async (userId)=>{
+    console.log('creating a new lesson for the user')
+    const created_Lesson = await Lesson_for_student.create({
+        student_id: userId,
+        current_stage: 1
+    })
+    if (created_Lesson) {
+       return created_Lesson
+    }
+    else {
+        return null
+    }
+}
 
 const newStage = async (req, res) => {
-    const {stage} = req.params;
-    const lessonId = req.lessonId;
+    const {stage,lessonId} = req.query;
     await Sublesson_for_student.create({
         lesson_id: lessonId,
         subLesson_date: new Date,
@@ -82,13 +94,13 @@ const newStage = async (req, res) => {
 }
 
 const updateSuccess = async (req, res) => {
-    const {success} = req.body;
+    const {success, lessonId , stage} = req.body;
     const {userId}=req.user;
-    console.log(`userrrrrrrrrrrrr ${userId}`)
-    const lessonId = await User.findOne({ attributes: ['id_currentLesson'] }, { where: { user_id: userId } })//id of current lesson
-    console.log(`lesson  id ${lessonId.id_currentLesson}`)
-    const curStage = await Lesson_for_student.findOne({ attributes: ['current_stage'] }, { where: { lesson_id: lessonId } })
-    console.log(`stage ${curStage}`)
+    // console.log(`userrrrrrrrrrrrr ${userId}`)
+    // const lessonId = await User.findOne({ attributes: ['id_currentLesson'] }, { where: { user_id: userId } })//id of current lesson
+    // console.log(`lesson  id ${lessonId.id_currentLesson}`)
+    // const curStage = await Lesson_for_student.findOne({ attributes: ['current_stage'] }, { where: { lesson_id: lessonId } })
+    // console.log(`stage ${curStage}`)
     const update = await Sublesson_for_student.update(
         {
             success,
@@ -96,7 +108,7 @@ const updateSuccess = async (req, res) => {
         {
             where: {
                 lesson_id: lessonId,
-                // stage: curStage
+                stage
             }
         }
     )
@@ -130,5 +142,6 @@ module.exports = {
     newLesson,
     newStage,
     updateSuccess,
-    getSuccessForDate
+    getSuccessForDate,
+    newLessonForUser
 }
