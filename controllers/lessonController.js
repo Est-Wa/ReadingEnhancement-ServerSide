@@ -13,9 +13,11 @@ const { QueryTypes } = require('sequelize');
 // not all edge cases work!
 //if their is a need for images the user sends in the body withImg = true;
 const getWords = async (req, res) => {
-    let {userId,withImg} = req.query
-    console.log(withImg)
-    let lessonId = await User.findOne({ attributes: ['id_currentLesson'] }, { where: { user_id: userId } })//id of current lesson
+    // let {userId,withImg} = req.query
+    const {userId}=req.user;
+    const {withImg} = req.query;
+    console.log(withImg);
+    const lessonId = await User.findOne({ attributes: ['id_currentLesson'] }, { where: { user_id: userId } })//id of current lesson
     console.log(lessonId)
     let requiredVoweles = await Vowelization_for_lesson.findAll({ attributes: ['vowelization_id'] }, { where: { lesson_id: lessonId } })//array of all vowel for this lesson
     requiredVoweles = [...requiredVoweles].map(obj => obj.vowelization_id)
@@ -45,15 +47,17 @@ const getWords = async (req, res) => {
 }
 
 const getCurrentStage = async (req, res) => {
-    let userId = req.params.userId
-    let lessonId = await User.findOne({ attributes: ['id_currentLesson'] }, { where: { user_id: userId } })
-    let stage = await Lesson_for_student.findOne({ attributes: ['current_stage'] }, { where: { lesson_id: lessonId } })
+    // let userId = req.params.userId
+    const {userId}=req.user;
+    const lessonId = await User.findOne({ attributes: ['id_currentLesson'] }, { where: { user_id: userId } })
+    const stage = await Lesson_for_student.findOne({ attributes: ['current_stage'] }, { where: { lesson_id: lessonId } })
     res.send(stage)
 }
 
 //✌
 const newLesson = async (req, res) => {
-    let userId = req.body.userId
+    // let userId = req.body.userId
+    const {userId}=req.user;
     const created_Lesson = await Lesson_for_student.create({
         student_id: userId,
         current_stage: 1
@@ -68,8 +72,8 @@ const newLesson = async (req, res) => {
 }
 
 const newStage = async (req, res) => {
-    let stage = req.params.stage
-    let lessonId = req.lessonId
+    const {stage} = req.params;
+    const lessonId = req.lessonId;
     await Sublesson_for_student.create({
         lesson_id: lessonId,
         subLesson_date: new Date,
@@ -78,20 +82,21 @@ const newStage = async (req, res) => {
 }
 
 const updateSuccess = async (req, res) => {
-    const { userId, success } = req.body
+    const {success} = req.body;
+    const {userId}=req.user;
     console.log(`userrrrrrrrrrrrr ${userId}`)
-    let lessonId = await User.findOne({ attributes: ['id_currentLesson'] }, { where: { user_id: userId } })//id of current lesson
+    const lessonId = await User.findOne({ attributes: ['id_currentLesson'] }, { where: { user_id: userId } })//id of current lesson
     console.log(`lesson  id ${lessonId.id_currentLesson}`)
     const curStage = await Lesson_for_student.findOne({ attributes: ['current_stage'] }, { where: { lesson_id: lessonId } })
     console.log(`stage ${curStage}`)
-    let update = await Sublesson_for_student.update(
+    const update = await Sublesson_for_student.update(
         {
-            success: success
+            success,
         },
         {
             where: {
                 lesson_id: lessonId,
-                stage: curStage
+                // stage: curStage
             }
         }
     )
@@ -104,10 +109,11 @@ const updateSuccess = async (req, res) => {
 }
 
 const getSuccessForDate = async (req, res) => {
-    let userId = req.body.userId
-    let date = req.params.date
-    let lessons = await Lesson_for_student.findAll({ attributes: ['lesson_id'] }, { where: { user_id: userId } })
-    let avgSuccess = await Sublesson_for_student.findAll(
+    // let userId = req.body.userId
+    const {userId}=req.user;
+    const date = req.params.date;
+    const lessons = await Lesson_for_student.findAll({ attributes: ['lesson_id'] }, { where: { user_id: userId } })
+    const avgSuccess = await Sublesson_for_student.findAll(
         {
             attributes: [Sequelize.fn('AVG', Sequelize.col('success')), 'avgSuccess']
         },

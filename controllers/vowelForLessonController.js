@@ -6,17 +6,17 @@ const { Op } = require("sequelize");
 //✌
 //create
 const addVowelForLesson = async (req, res) => {
-    let{lessonId,vowelization} = req.body;
-    if(!lessonId||!vowelization){
+    let{lessonId,vowelization_id} = req.body;
+    if(!lessonId||!vowelization_id){
         return res.status(400).json({message:`all fields are required`})
     }
-    let vowel = await Vowelization.findOne({
-        attributes: ['vowelization_id'],
-        where: { vowelization: vowelization }
-    });
+    // let vowel = await Vowelization.findOne({
+    //     attributes: ['vowelization_id'],
+    //     where: { vowelization: vowelization }
+    // });
     const created_vowelForLesson = await Vowelization_for_lesson.create({
         lesson_id: lessonId,
-        vowelization_id: vowel.vowelization_id,
+        vowelization_id: vowelization_id,
     });
     if(created_vowelForLesson){
         res.status(200).json({message:`created successfuly`})

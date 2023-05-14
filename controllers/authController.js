@@ -37,11 +37,8 @@ const login = async (req, res) => {
         id_currentLesson: foundUser.id_currentLesson,
     }
 
-    //Create the token
-    //const accessToken = jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET)
     const accessToken = jwt.sign(userInfo,'60a407c80785905efab187be0b6ab63fcd5a77b6e9dfbb62b329805dc17f165d82725997a471ee025b7d3f46ebc9894a405d3ae13594c44fb53635ac12bf1417')
-    //res.setHeader('Authorization', `Bearer ${accessToken}`)
-
+    
     res.json({ accessToken: accessToken,
     user : userInfo })
 

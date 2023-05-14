@@ -1,25 +1,26 @@
 const express = require('express')
 const router = express.Router()
 const lessonController = require("../controllers/lessonController")
+const verifyJWT = require ('../middleware/verifyJWT');
 
 router.route('/')
     // .get()
-    .post(lessonController.newLesson)
+    .post(verifyJWT,lessonController.newLesson)
     // .put()
     // .delete()
 
 router.route('/words')
-    .get(lessonController.getWords)
+    .get(verifyJWT,lessonController.getWords)
 
 router.route('/stage')
-    .get(lessonController.getCurrentStage)
-    .post(lessonController.newStage)
+    .get(verifyJWT,lessonController.getCurrentStage)
+    .post(verifyJWT,lessonController.newStage)
     // .put()
     // .delete()
 
 router.route('/success/:date')
-    .get(lessonController.getSuccessForDate)
+    .get(verifyJWT,lessonController.getSuccessForDate)
 router.route('/success')
-    .put(lessonController.updateSuccess)
+    .put(verifyJWT,lessonController.updateSuccess)
 
 module.exports = router
