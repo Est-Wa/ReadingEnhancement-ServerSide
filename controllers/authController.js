@@ -2,7 +2,7 @@ const db = require('../models/index')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const User = db.users
-
+ const {newLessonForUser} = require("./lessonController")
 //✌
 const login = async (req, res) => {
 
@@ -85,7 +85,11 @@ const register = async (req, res) => {
     }
     const user = await User.create(userObject)
     if (user) { // Created 
-        return res.status(201).json({ message: `New user ${user.user_name} created` })
+        //after register  user than add a lesson
+        //  
+        console.log(user.dataValues.user_id)
+        const createdLesson = await newLessonForUser(user.dataValues.user_id)
+        return res.status(201).json({ message: `New user ${user.user_name} created` , LessonId:createdLesson.lesson_id})
     } else {
         return res.status(400).json({ message: 'Invalid user data received' })
     }

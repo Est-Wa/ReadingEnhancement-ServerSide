@@ -63,17 +63,34 @@ const newLesson = async (req, res) => {
         current_stage: 1
     })
     if (created_Lesson) {
-        res.status(200).json({ message: `created successfuly` })
+        res.status(200).json(created_Lesson )
     }
     else {
         res.status(400).json({ message: `invalied data` })
     }
 
 }
+const newLessonForUser=async (userId)=>{
+    console.log('creating a new lesson for the user')
+    const created_Lesson = await Lesson_for_student.create({
+        student_id: userId,
+        current_stage: 1
+    })
+    if (created_Lesson) {
+       return created_Lesson
+    }
+    else {
+        return null
+    }
+}
 
 const newStage = async (req, res) => {
+<<<<<<< HEAD
     const {stage} = req.params;
     const lessonId = req.lessonId;
+=======
+    const {stage,lessonId} = req.query;
+>>>>>>> c4d9a27779900c1f686c7da3e68e2672dd33d446
     await Sublesson_for_student.create({
         lesson_id: lessonId,
         subLesson_date: new Date,
@@ -82,6 +99,7 @@ const newStage = async (req, res) => {
 }
 
 const updateSuccess = async (req, res) => {
+<<<<<<< HEAD
     const {success} = req.body;
     const {userId}=req.user;
     console.log(`userrrrrrrrrrrrr ${userId}`)
@@ -89,6 +107,15 @@ const updateSuccess = async (req, res) => {
     console.log(`lesson  id ${lessonId.id_currentLesson}`)
     const curStage = await Lesson_for_student.findOne({ attributes: ['current_stage'] }, { where: { lesson_id: lessonId } })
     console.log(`stage ${curStage}`)
+=======
+    const {success, lessonId , stage} = req.body;
+    const {userId}=req.user;
+    // console.log(`userrrrrrrrrrrrr ${userId}`)
+    // const lessonId = await User.findOne({ attributes: ['id_currentLesson'] }, { where: { user_id: userId } })//id of current lesson
+    // console.log(`lesson  id ${lessonId.id_currentLesson}`)
+    // const curStage = await Lesson_for_student.findOne({ attributes: ['current_stage'] }, { where: { lesson_id: lessonId } })
+    // console.log(`stage ${curStage}`)
+>>>>>>> c4d9a27779900c1f686c7da3e68e2672dd33d446
     const update = await Sublesson_for_student.update(
         {
             success,
@@ -96,7 +123,11 @@ const updateSuccess = async (req, res) => {
         {
             where: {
                 lesson_id: lessonId,
+<<<<<<< HEAD
                 // stage: curStage
+=======
+                stage
+>>>>>>> c4d9a27779900c1f686c7da3e68e2672dd33d446
             }
         }
     )
@@ -130,5 +161,6 @@ module.exports = {
     newLesson,
     newStage,
     updateSuccess,
-    getSuccessForDate
+    getSuccessForDate,
+    newLessonForUser
 }
