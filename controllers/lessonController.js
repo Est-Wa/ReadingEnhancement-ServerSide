@@ -86,11 +86,31 @@ const newLessonForUser=async (userId)=>{
 
 const newStage = async (req, res) => {
     const {stage,lessonId} = req.query;
-    await Sublesson_for_student.create({
+    const createdStage = await Sublesson_for_student.create({
         lesson_id: lessonId,
         subLesson_date: new Date,
         stage: stage
     })
+    if(createdStage){
+        res.status(204).json({message:`stage created successfully`,data:createdStage})
+    }
+    else{
+        res.status(400).json(`error accrued while creating`)
+    }
+}
+
+const newStageForUser = async (stage, lesson_id) => {
+    const createdStage = await Sublesson_for_student.create({
+        lesson_id: lesson_id,
+        subLesson_date: new Date,
+        stage: stage
+    })
+    if(createdStage){
+        return createdStage
+    }
+    else{
+        return null;
+    }
 }
 
 const updateSuccess = async (req, res) => {
@@ -143,5 +163,6 @@ module.exports = {
     newStage,
     updateSuccess,
     getSuccessForDate,
-    newLessonForUser
+    newLessonForUser,
+    newStageForUser
 }
