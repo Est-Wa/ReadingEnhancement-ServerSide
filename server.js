@@ -9,7 +9,7 @@ const { sendAlert } = require('./controllers/alertForUserController')
 
 //middleware
 //for static files that is send as a response
-//app.use('/', express.static(path.join(__dirname,'public')))
+app.use('/', express.static(path.join(__dirname,'public')))
 app.use(cors())
 app.use(express.json())
 app.use(cookieParser())
