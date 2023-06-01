@@ -7,7 +7,7 @@ async function SpeechToText(filePath) {
 
     const binaryData = fs.readFileSync(filePath);
     const base64Data = binaryData.toString('base64');
-    const res = await axios.post(`https://speech.googleapis.com/v1p1beta1/speech:recognize?key=${'AIzaSyAE-xzt4CN_gboJm7JNFm1YTqbDCulohNk'}`,
+    const res = await axios.post(`https://speech.googleapis.com/v1p1beta1/speech:recognize?key=${APIKEY}`,
     {
         "audio": {
           "content": base64Data
