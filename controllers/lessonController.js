@@ -14,29 +14,63 @@ const { QueryTypes } = require('sequelize');
 //if their is a need for images the user sends in the body withImg = true;
 const getWords = async (req, res) => {
     // let {userId,withImg} = req.query
-    const {userId}=req.user;
-    const {withImg} = req.query;
+    const { user_id } = req.user;
+    console.log(user_id)
+    const { withImg } = req.query;
+    console.log('---------------------------------')
+    console.log('withImg');
     console.log(withImg);
-    const lessonId = await User.findOne({ attributes: ['id_currentLesson'] }, { where: { user_id: userId } })//id of current lesson
+    console.log('---------------------------------')
+
+    
+    const user = await User.findOne({
+        attributes: ["id_currentLesson"], // Retrieve only the id_currentLesson column
+        where: {
+            user_id // Filter by user_id
+        }
+    });
+    const lessonId = user.id_currentLesson
+    console.log('---------------------------------')
+
+    console.log('lessonId')
     console.log(lessonId)
-    let requiredVoweles = await Vowelization_for_lesson.findAll({ attributes: ['vowelization_id'] }, { where: { lesson_id: lessonId } })//array of all vowel for this lesson
+    console.log('---------------------------------')
+
+    let requiredVoweles = await Vowelization_for_lesson.findAll({ attributes: ['vowelization_id'], where: { lesson_id: lessonId } })//array of all vowel for this lesson
     requiredVoweles = [...requiredVoweles].map(obj => obj.vowelization_id)
+    console.log('---------------------------------')
+
+    console.log('requiredVoweles')
     console.log(requiredVoweles)
-    let optionalVoweles = await Student_level.findAll({ attributes: ['vowelization_id'] }, { where: { user_id: userId } })
+    console.log('---------------------------------')
+
+    let optionalVoweles = await Student_level.findAll({ attributes: ['vowelization_id'] , where: {student_id: user_id } })
     optionalVoweles = [...optionalVoweles].map(obj => obj.vowelization_id)
+    console.log('---------------------------------')
+
+    console.log('optionalVoweles')
     console.log(optionalVoweles)
+    console.log('---------------------------------')
+
     function countUnique(iterable) {
         return new Set(iterable).size;
     }
     let word_codes = [];
+    if(optionalVoweles.length != 0){
+        word_codes =
+        await db.sequelize.query(`select word_id from vowelizations_for_words v1 where (vowelization_id in (${requiredVoweles}) or vowelization_id in (${optionalVoweles})) and ${countUnique(requiredVoweles)} =  (select count(distinct vowelization_id) from vowelizations_for_words v2 where v2.word_id = v1.word_id and vowelization_id in (${requiredVoweles})) group by word_id having count(word_id) = (select count(*) from vowelizations_for_words where word_id = v1.word_id)`, { type: QueryTypes.SELECT })
+        //having count(word_id) = (select count(*) from vowelizations_for_words where word_id = v1.word_id)
+    }
+    else(
     word_codes =
-        await db.sequelize.query(`select word_id from vowelizations_for_words v1 where (vowelization_id in (${requiredVoweles}) or vowelization_id in (${optionalVoweles})) and ${countUnique(requiredVoweles)} =  (select count(distinct vowelization_id) from vowelizations_for_words v2 where v2.word_id = v1.word_id and vowelization_id in (${requiredVoweles})) group by word_id`, { type: QueryTypes.SELECT })
-    wordCodes = word_codes.map((word) => word.word_id);
+        await db.sequelize.query(`select word_id from vowelizations_for_words v1 where (vowelization_id in (${requiredVoweles}) and ${countUnique(requiredVoweles)} =  (select count(distinct vowelization_id) from vowelizations_for_words v2 where v2.word_id = v1.word_id and vowelization_id in (${requiredVoweles}))) group by word_id`, { type: QueryTypes.SELECT })
+    )
+    const wordCodes = word_codes.map((word) => word.word_id);
     let words = await Word.findAll({ attributes: ['word', 'path'], where: { word_id: { [Op.in]: wordCodes } } })
     if (withImg == 'true') {
         console.log('with image')
         const wordsWithImgs = words.filter(word => word.path != null)
-        words = words.filter(word=>word.path == null)
+        words = words.filter(word => word.path == null)
         words = words.map(word => word.word)
         const dataToReturn = { words: words, wordsWithImgs }
         res.send(dataToReturn)
@@ -47,37 +81,47 @@ const getWords = async (req, res) => {
 }
 
 const getCurrentStage = async (req, res) => {
-    // let userId = req.params.userId
-    const {userId}=req.user;
-    const lessonId = await User.findOne({ attributes: ['id_currentLesson'] }, { where: { user_id: userId } })
-    const stage = await Lesson_for_student.findOne({ attributes: ['current_stage'] }, { where: { lesson_id: lessonId } })
-    res.send(stage)
+    const { user_id } = req.user;
+    const user = await User.findOne({
+        attributes: ["id_currentLesson"], // Retrieve only the id_currentLesson column
+        where: {
+            user_id // Filter by user_id
+        }
+    });
+    const lessonId = user.id_currentLesson
+    const stage = await Lesson_for_student.findOne({
+        attributes: ['current_stage'],
+        where: {
+            lesson_id: lessonId
+        }
+    })
+    res.send( stage)
 }
 
 //✌
 const newLesson = async (req, res) => {
     // let userId = req.body.userId
-    const {userId}=req.user;
+    const { userId } = req.user;
     const created_Lesson = await Lesson_for_student.create({
         student_id: userId,
         current_stage: 1
     })
     if (created_Lesson) {
-        res.status(200).json(created_Lesson )
+        res.status(200).json(created_Lesson)
     }
     else {
         res.status(400).json({ message: `invalied data` })
     }
 
 }
-const newLessonForUser=async (userId)=>{
+const newLessonForUser = async (userId) => {
     console.log('creating a new lesson for the user')
     const created_Lesson = await Lesson_for_student.create({
         student_id: userId,
         current_stage: 1
     })
     if (created_Lesson) {
-       return created_Lesson
+        return created_Lesson
     }
     else {
         return null
@@ -85,16 +129,16 @@ const newLessonForUser=async (userId)=>{
 }
 
 const newStage = async (req, res) => {
-    const {stage,lessonId} = req.query;
+    const { stage, lessonId } = req.query;
     const createdStage = await Sublesson_for_student.create({
         lesson_id: lessonId,
         subLesson_date: new Date,
         stage: stage
     })
-    if(createdStage){
-        res.status(204).json({message:`stage created successfully`,data:createdStage})
+    if (createdStage) {
+        res.status(204).json({ message: `stage created successfully`, data: createdStage })
     }
-    else{
+    else {
         res.status(400).json(`error accrued while creating`)
     }
 }
@@ -105,17 +149,17 @@ const newStageForUser = async (stage, lesson_id) => {
         subLesson_date: new Date,
         stage: stage
     })
-    if(createdStage){
+    if (createdStage) {
         return createdStage
     }
-    else{
+    else {
         return null;
     }
 }
 
 const updateSuccess = async (req, res) => {
-    const {success, lessonId , stage} = req.body;
-    const {userId}=req.user;
+    const { success, lessonId, stage } = req.body;
+    const { userId } = req.user;
     // console.log(`userrrrrrrrrrrrr ${userId}`)
     // const lessonId = await User.findOne({ attributes: ['id_currentLesson'] }, { where: { user_id: userId } })//id of current lesson
     // console.log(`lesson  id ${lessonId.id_currentLesson}`)
@@ -132,17 +176,17 @@ const updateSuccess = async (req, res) => {
             }
         }
     )
-    if(update){
+    if (update) {
         res.send('updated')
     }
-    else{
+    else {
         res.send('err')
     }
 }
 
 const getSuccessForDate = async (req, res) => {
     // let userId = req.body.userId
-    const {userId}=req.user;
+    const { userId } = req.user;
     const date = req.params.date;
     const lessons = await Lesson_for_student.findAll({ attributes: ['lesson_id'] }, { where: { user_id: userId } })
     const avgSuccess = await Sublesson_for_student.findAll(

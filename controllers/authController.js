@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const User = db.users
 const { newLessonForUser, newStageForUser } = require("./lessonController")
+const { newVowelForLesson } = require('./vowelForLessonController')
+const {newLevel} = require ('./levelController')
 //✌
 const login = async (req, res) => {
 
@@ -91,13 +93,18 @@ const register = async (req, res) => {
     if (user) { // Created 
         //after register  user than add a lesson
         //  
-        console.log(user.dataValues.user_id)
-        const createdLesson = await newLessonForUser(user.dataValues.user_id)
+        const userId = user.dataValues.user_id
+        const createdLesson = await newLessonForUser(userId)
         const createdStage = await newStageForUser(1, createdLesson.dataValues.lesson_id);
-        //update the vowels.
-        if (createdLesson && createdStage)
+        if (createdLesson && createdStage) {
+            const lesson_id = createdLesson.dataValues.lesson_id
+            await User.update({id_currentLesson:lesson_id},{where:{user_id:userId}})
+            vowelsForLesson.forEach(v => newVowelForLesson(lesson_id, v));
+            vowelsForLevel.forEach(v => newLevel(userId, v));
             return res.status(201).json({ message: `New user ${user.user_name} created`, LessonId: createdLesson.lesson_id })
-    } else {
+        }
+    }
+    else {
         return res.status(400).json({ message: 'Invalid user data received' })
     }
 

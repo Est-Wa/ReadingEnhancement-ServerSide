@@ -38,10 +38,10 @@ const deleteLevel = async (req, res) => {
         }
     });
     if (des) {
-        res.status(200).json({ message: `record deleted successfuly` })
+        res.status(200).json({ message: `record deleted successfully` })
     }
     else {
-        res.status(400).json({ message: `couldnt delete record` })
+        res.status(400).json({ message: `couldn't delete record` })
     }
 };
 
@@ -60,15 +60,32 @@ const addLevel = async (req, res) => {
         vowelization_id: vowel.vowelization_id,
     });
     if (created_student_level) {
-        res.status(200).json({ message: `created successfuly` })
+        res.status(200).json({ message: `created successfully` })
     }
     else {
-        res.status(400).json({ message: `invalied data` })
+        res.status(400).json({ message: `invalid data` })
+    }
+};
+
+const newLevel = async ( studentId, vowelization) => {
+    if (!studentId || !vowelization) {
+        return res.status(400).json({ message: `all fields are required` })
+    }
+    const created_student_level = await Student_level.create({
+        student_id: studentId,
+        vowelization_id: vowelization,
+    });
+    if (created_student_level) {
+        return true
+    }
+    else {
+        return false
     }
 };
 
 module.exports = {
     getLevelForStudent,
     deleteLevel,
-    addLevel
+    addLevel,
+    newLevel
 }
