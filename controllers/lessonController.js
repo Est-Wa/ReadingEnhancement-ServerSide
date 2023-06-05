@@ -14,24 +14,15 @@ const { QueryTypes } = require('sequelize');
 //if their is a need for images the user sends in the body withImg = true;
 const getWords = async (req, res) => {
     // let {userId,withImg} = req.query
-    const { user_id } = req.user;
+    const { user_id, id_currentLesson } = req.user;
     console.log(user_id)
     const { withImg } = req.query;
     console.log('---------------------------------')
     console.log('withImg');
     console.log(withImg);
     console.log('---------------------------------')
-
-    
-    const user = await User.findOne({
-        attributes: ["id_currentLesson"], // Retrieve only the id_currentLesson column
-        where: {
-            user_id // Filter by user_id
-        }
-    });
-    const lessonId = user.id_currentLesson
+    const lessonId = id_currentLesson
     console.log('---------------------------------')
-
     console.log('lessonId')
     console.log(lessonId)
     console.log('---------------------------------')
@@ -44,7 +35,7 @@ const getWords = async (req, res) => {
     console.log(requiredVoweles)
     console.log('---------------------------------')
 
-    let optionalVoweles = await Student_level.findAll({ attributes: ['vowelization_id'] , where: {student_id: user_id } })
+    let optionalVoweles = await Student_level.findAll({ attributes: ['vowelization_id'], where: { student_id: user_id } })
     optionalVoweles = [...optionalVoweles].map(obj => obj.vowelization_id)
     console.log('---------------------------------')
 
@@ -56,13 +47,13 @@ const getWords = async (req, res) => {
         return new Set(iterable).size;
     }
     let word_codes = [];
-    if(optionalVoweles.length != 0){
+    if (optionalVoweles.length != 0) {
         word_codes =
-        await db.sequelize.query(`select word_id from vowelizations_for_words v1 where (vowelization_id in (${requiredVoweles}) or vowelization_id in (${optionalVoweles})) and ${countUnique(requiredVoweles)} =  (select count(distinct vowelization_id) from vowelizations_for_words v2 where v2.word_id = v1.word_id and vowelization_id in (${requiredVoweles})) group by word_id having count(word_id) = (select count(*) from vowelizations_for_words where word_id = v1.word_id)`, { type: QueryTypes.SELECT })
+            await db.sequelize.query(`select word_id from vowelizations_for_words v1 where (vowelization_id in (${requiredVoweles}) or vowelization_id in (${optionalVoweles})) and ${countUnique(requiredVoweles)} =  (select count(distinct vowelization_id) from vowelizations_for_words v2 where v2.word_id = v1.word_id and vowelization_id in (${requiredVoweles})) group by word_id having count(word_id) = (select count(*) from vowelizations_for_words where word_id = v1.word_id)`, { type: QueryTypes.SELECT })
         //having count(word_id) = (select count(*) from vowelizations_for_words where word_id = v1.word_id)
     }
-    else(
-    word_codes =
+    else (
+        word_codes =
         await db.sequelize.query(`select word_id from vowelizations_for_words v1 where (vowelization_id in (${requiredVoweles}) and ${countUnique(requiredVoweles)} =  (select count(distinct vowelization_id) from vowelizations_for_words v2 where v2.word_id = v1.word_id and vowelization_id in (${requiredVoweles}))) group by word_id`, { type: QueryTypes.SELECT })
     )
     const wordCodes = word_codes.map((word) => word.word_id);
@@ -81,29 +72,23 @@ const getWords = async (req, res) => {
 }
 
 const getCurrentStage = async (req, res) => {
-    const { user_id } = req.user;
-    const user = await User.findOne({
-        attributes: ["id_currentLesson"], // Retrieve only the id_currentLesson column
-        where: {
-            user_id // Filter by user_id
-        }
-    });
-    const lessonId = user.id_currentLesson
+    const { id_currentLesson } = req.user;
+    const lessonId = id_currentLesson
     const stage = await Lesson_for_student.findOne({
         attributes: ['current_stage'],
         where: {
             lesson_id: lessonId
         }
     })
-    res.send( stage)
+    res.send(stage)
 }
 
 //✌
 const newLesson = async (req, res) => {
     // let userId = req.body.userId
-    const { userId } = req.user;
+    const { user_id } = req.user;
     const created_Lesson = await Lesson_for_student.create({
-        student_id: userId,
+        student_id: user_id,
         current_stage: 1
     })
     if (created_Lesson) {
@@ -129,13 +114,16 @@ const newLessonForUser = async (userId) => {
 }
 
 const newStage = async (req, res) => {
-    const { stage, lessonId } = req.query;
+    const { stage } = req.body;
+    const { id_currentLesson, user_id } = req.user;
+    const lesson_id = id_currentLesson;
     const createdStage = await Sublesson_for_student.create({
-        lesson_id: lessonId,
-        subLesson_date: new Date,
-        stage: stage
+        lesson_id,
+        stage: stage + 1
     })
     if (createdStage) {
+        console.log('created')
+        await Lesson_for_student.update({ current_stage: stage + 1 }, { where: { student_id: user_id } })
         res.status(204).json({ message: `stage created successfully`, data: createdStage })
     }
     else {
@@ -158,25 +146,21 @@ const newStageForUser = async (stage, lesson_id) => {
 }
 
 const updateSuccess = async (req, res) => {
-    const { success, lessonId, stage } = req.body;
-    const { userId } = req.user;
-    // console.log(`userrrrrrrrrrrrr ${userId}`)
-    // const lessonId = await User.findOne({ attributes: ['id_currentLesson'] }, { where: { user_id: userId } })//id of current lesson
-    // console.log(`lesson  id ${lessonId.id_currentLesson}`)
-    // const curStage = await Lesson_for_student.findOne({ attributes: ['current_stage'] }, { where: { lesson_id: lessonId } })
-    // console.log(`stage ${curStage}`)
+    const { success, stage } = req.body;
+    const { id_currentLesson } = req.user;
     const update = await Sublesson_for_student.update(
         {
             success,
         },
         {
             where: {
-                lesson_id: lessonId,
+                lesson_id: id_currentLesson,
                 stage
             }
         }
     )
-    if (update) {
+    console.log(update)
+    if (update.length > 0) {
         res.send('updated')
     }
     else {
