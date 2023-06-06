@@ -2,7 +2,9 @@ const db = require('../models/index')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const User = db.users
- const {newLessonForUser} = require("./lessonController")
+const { newLessonForUser, newStageForUser } = require("./lessonController")
+const { newVowelForLesson } = require('./vowelForLessonController')
+const {newLevel} = require ('./levelController')
 //✌
 const login = async (req, res) => {
 
@@ -37,10 +39,12 @@ const login = async (req, res) => {
         id_currentLesson: foundUser.id_currentLesson,
     }
 
-    const accessToken = jwt.sign(userInfo,'60a407c80785905efab187be0b6ab63fcd5a77b6e9dfbb62b329805dc17f165d82725997a471ee025b7d3f46ebc9894a405d3ae13594c44fb53635ac12bf1417')
-    
-    res.json({ accessToken: accessToken,
-    user : userInfo })
+    const accessToken = jwt.sign(userInfo, '60a407c80785905efab187be0b6ab63fcd5a77b6e9dfbb62b329805dc17f165d82725997a471ee025b7d3f46ebc9894a405d3ae13594c44fb53635ac12bf1417')
+
+    res.json({
+        accessToken: accessToken,
+        user: userInfo
+    })
 
 }
 
@@ -55,9 +59,11 @@ const register = async (req, res) => {
         student_firstName,
         student_lastName,
         birth_date,
-        gender } = req.body
+        gender,
+        vowelsForLesson,
+        vowelsForLevel } = req.body
 
-        console.log(req.body)
+    console.log(req.body)
 
     if (!user_lastName || !user_firstName || !email_address || !student_firstName || !student_lastName || !user_name || !password) {// Confirm data
         return res.status(400).json({ message: 'All fields are required' })
@@ -87,10 +93,18 @@ const register = async (req, res) => {
     if (user) { // Created 
         //after register  user than add a lesson
         //  
-        console.log(user.dataValues.user_id)
-        const createdLesson = await newLessonForUser(user.dataValues.user_id)
-        return res.status(201).json({ message: `New user ${user.user_name} created` , LessonId:createdLesson.lesson_id})
-    } else {
+        const userId = user.dataValues.user_id
+        const createdLesson = await newLessonForUser(userId)
+        const createdStage = await newStageForUser(1, createdLesson.dataValues.lesson_id);
+        if (createdLesson && createdStage) {
+            const lesson_id = createdLesson.dataValues.lesson_id
+            await User.update({id_currentLesson:lesson_id},{where:{user_id:userId}})
+            vowelsForLesson.forEach(v => newVowelForLesson(lesson_id, v));
+            vowelsForLevel.forEach(v => newLevel(userId, v));
+            return res.status(201).json({ message: `New user ${user.user_name} created`, LessonId: createdLesson.lesson_id })
+        }
+    }
+    else {
         return res.status(400).json({ message: 'Invalid user data received' })
     }
 

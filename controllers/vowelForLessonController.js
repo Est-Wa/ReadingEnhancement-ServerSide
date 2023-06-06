@@ -6,26 +6,38 @@ const { Op } = require("sequelize");
 //✌
 //create
 const addVowelForLesson = async (req, res) => {
-    let{lessonId,vowelization_id} = req.body;
-    if(!lessonId||!vowelization_id){
-        return res.status(400).json({message:`all fields are required`})
+    const { lessonId, vowelization_id } = req.body;
+    if (!lessonId || !vowelization_id) {
+        return res.status(400).json({ message: `all fields are required` })
     }
-    // let vowel = await Vowelization.findOne({
-    //     attributes: ['vowelization_id'],
-    //     where: { vowelization: vowelization }
-    // });
     const created_vowelForLesson = await Vowelization_for_lesson.create({
         lesson_id: lessonId,
         vowelization_id: vowelization_id,
     });
-    if(created_vowelForLesson){
-        res.status(200).json({message:`created successfuly`})
+    if (created_vowelForLesson) {
+        res.status(200).json({ message: `created successfuly` })
     }
-    else{
-        res.status(400).json({message:`invalied data`})
+    else {
+        res.status(400).json({ message: `invalied data` })
     }
 };
 
+
+const newVowelForLesson = async ( lessonId, vowelization_id ) => {
+    if (!lessonId || !vowelization_id) {
+        return res.status(400).json({ message: `all fields are required` })
+    }
+    const created_vowelForLesson = await Vowelization_for_lesson.create({
+        lesson_id: lessonId,
+        vowelization_id: vowelization_id,
+    });
+    if (created_vowelForLesson) {
+        return true ;
+    }
+    else {
+        return false ;
+    }
+};
 //✌
 //read
 const getVowelsForLesson = async (req, res) => {
@@ -75,5 +87,6 @@ const deleteVowelForLesson = async (req, res) => {
 module.exports = {
     addVowelForLesson,
     getVowelsForLesson,
-    deleteVowelForLesson
+    deleteVowelForLesson,
+    newVowelForLesson
 }
