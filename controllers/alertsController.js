@@ -41,6 +41,15 @@ const getAlertByDescription = async (req, res) => {
     }
 }
 
+const getAlertByDescriptionInternal = async (description) =>{
+    if (!description) 
+        return null
+    const singleAlert = await Alerts.findOne({ where: { alert_description: description } })
+    if (singleAlert) 
+        return singleAlert
+    else return null
+}
+
 //האם נצרך?
 const getAlertById = async (req, res) => {
 }
@@ -61,4 +70,4 @@ const updateAlert = async (req, res) => {
 }
 //delete
 
-module.exports = { addAlert, getAllAlerts, getAlertByDescription, updateAlert }
+module.exports = { addAlert, getAllAlerts, getAlertByDescription, updateAlert,getAlertByDescriptionInternal }

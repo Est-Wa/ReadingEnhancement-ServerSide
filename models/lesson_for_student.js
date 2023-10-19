@@ -20,7 +20,7 @@ const Lesson_for_student = sequelize.define(
             type: DataTypes.INTEGER,
             allowNull:false
         },
-        is_complit:{
+        is_complete:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
         }

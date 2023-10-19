@@ -4,8 +4,9 @@ const express = require('express')
 const app = express()
 const path = require('path')
 const cors = require('cors')
+const cron = require('node-cron');
 const PORT = process.env.PORT || 3600
-const { sendAlert } = require('./controllers/alertForUserController')
+const {alertsDailyJob} = require('./utils/SchedulingService')
 
 //middleware
 //for static files that is send as a response
@@ -25,5 +26,7 @@ app.use("/api/level", require("./routes/levelRouter"));
 app.use("/api/vowelForLesson", require("./routes/vowelForLessonRouter"));
 app.use("/api/vowel", require("./routes/vowelRouter"));
 app.use("/api/word", require("./routes/wordRouter"));
+
+cron.schedule('28 19 * * *', alertsDailyJob)
 
 app.listen(PORT, () => console.log(`Server in running on port ${PORT}`))
